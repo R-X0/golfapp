@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if title %}{{ title }} - Pars.Golf{% else %}Pars.Golf - Par-Fect Your Game{% endif %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-charcoal: #3A4257;
+            --red: #A24936;
+            --yellow: #FFBC42;
+            --lavender: #E2B6CF;
+            --cadet-grey: #83A0A0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--primary-charcoal);
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--primary-charcoal);
+        }
+        
+        .nav-link {
+            color: white !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-charcoal);
+            border-color: var(--primary-charcoal);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2a3040;
+            border-color: #2a3040;
+        }
+        
+        .btn-secondary {
+            background-color: var(--cadet-grey);
+            border-color: var(--cadet-grey);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #738d8d;
+            border-color: #738d8d;
+        }
+        
+        .btn-accent {
+            background-color: var(--yellow);
+            border-color: var(--yellow);
+            color: var(--primary-charcoal);
+        }
+        
+        .btn-accent:hover {
+            background-color: #e0a73b;
+            border-color: #e0a73b;
+            color: var(--primary-charcoal);
+        }
+        
+        .btn-danger {
+            background-color: var(--red);
+            border-color: var(--red);
+        }
+        
+        .btn-danger:hover {
+            background-color: #8e4030;
+            border-color: #8e4030;
+        }
+        
+        .card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .badge-accent {
+            background-color: var(--yellow);
+            color: var(--primary-charcoal);
+        }
+        
+        .badge-primary {
+            background-color: var(--primary-charcoal);
+        }
+        
+        .footer {
+            background-color: var(--primary-charcoal);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .vote-btn {
+            background-color: var(--yellow);
+            color: var(--primary-charcoal);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .vote-btn:hover {
+            background-color: #e0a73b;
+        }
+        
+        .vote-btn-active {
+            background-color: var(--red);
+            color: white;
+        }
+        
+        .vote-btn-active:hover {
+            background-color: #8e4030;
+        }
+        
+        .username {
+            color: var(--lavender);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.index') }}">
+                <span class="me-2"><i class="fas fa-golf-ball"></i></span>
+                <span>Pars.Golf</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('clubs.index') }}">Clubs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('players.index') }}">Players</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('courses.index') }}">Courses</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_anonymous %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
+                        </li>
+                    {% else %}
+                        {% if current_user.role.name == 'Admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('main.admin_dashboard') }}">Admin</a>
+                            </li>
+                        {% endif %}
+                        {% if current_user.role.name in ['Employee', 'Admin'] %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('main.employee_dashboard') }}">Moderate</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('main.profile', username=current_user.username) }}">Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.edit_profile') }}">Edit Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    <footer class="footer mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5><i class="fas fa-golf-ball me-2"></i> Pars.Golf</h5>
+                    <p>Par-Fect Your Game</p>
+                    <p class="small">The premier platform for golf enthusiasts to vote on the best clubs, players, and courses.</p>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('main.index') }}" class="text-white">Home</a></li>
+                        <li><a href="{{ url_for('clubs.index') }}" class="text-white">Clubs</a></li>
+                        <li><a href="{{ url_for('players.index') }}" class="text-white">Players</a></li>
+                        <li><a href="{{ url_for('courses.index') }}" class="text-white">Courses</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Connect</h5>
+                    <div class="d-flex gap-3 fs-4">
+                        <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <p class="mt-3 small">© 2025 Pars.Golf. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

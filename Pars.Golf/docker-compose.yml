@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/parsgolf
+      - SECRET_KEY=development-key-change-in-production
+    volumes:
+      - .:/app
+      - ./app/static/uploads:/app/app/static/uploads
+    restart: always
+    
+  db:
+    image: postgres:14
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=parsgolf
+    ports:
+      - "5432:5432"
+    
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./app/static:/app/static
+    depends_on:
+      - web
+    restart: always
+    
+volumes:
+  postgres_data:

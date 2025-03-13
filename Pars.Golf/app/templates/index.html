@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-5">
+    <div class="col-md-6">
+        <h1 class="display-4 mb-3">Par-Fect Your Game</h1>
+        <p class="lead">Welcome to Pars.Golf, the premier platform for golf enthusiasts to vote on the best clubs, players, and courses.</p>
+        <p>Join our community to share your expertise, discover top-rated equipment, and connect with fellow golfers around the world.</p>
+        {% if current_user.is_anonymous %}
+        <div class="d-flex gap-3 mt-4">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary px-4 py-2">Join Now</a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary px-4 py-2">Login</a>
+        </div>
+        {% else %}
+        <div class="d-flex gap-3 mt-4">
+            <a href="{{ url_for('clubs.new') }}" class="btn btn-primary px-4 py-2">Add Club</a>
+            <a href="{{ url_for('players.new') }}" class="btn btn-primary px-4 py-2">Add Player</a>
+            <a href="{{ url_for('courses.new') }}" class="btn btn-primary px-4 py-2">Add Course</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <img src="{{ url_for('static', filename='img/hero-golf.jpg') }}" alt="Golf course" class="img-fluid rounded shadow-lg" style="height: 350px; object-fit: cover; width: 100%;">
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="bg-light p-4 rounded-3 shadow-sm">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <div class="display-4 text-primary mb-2"><i class="fas fa-golf-ball"></i></div>
+                    <h3>Discover Top Clubs</h3>
+                    <p>Find the best golf clubs ranked by golfers like you.</p>
+                    <a href="{{ url_for('clubs.index') }}" class="btn btn-sm btn-outline-primary">Browse Clubs</a>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="display-4 text-primary mb-2"><i class="fas fa-user-alt"></i></div>
+                    <h3>Follow Top Players</h3>
+                    <p>Keep up with the most popular professional golfers.</p>
+                    <a href="{{ url_for('players.index') }}" class="btn btn-sm btn-outline-primary">View Players</a>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="display-4 text-primary mb-2"><i class="fas fa-flag"></i></div>
+                    <h3>Explore Courses</h3>
+                    <p>Discover beautiful golf courses around the world.</p>
+                    <a href="{{ url_for('courses.index') }}" class="btn btn-sm btn-outline-primary">Find Courses</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Top Rated Clubs</h2>
+            <a href="{{ url_for('clubs.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <hr>
+    </div>
+    
+    {% if top_clubs %}
+        {% for club in top_clubs %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                {% if club.image_url %}
+                <img src="{{ club.image_url }}" class="card-img-top" alt="{{ club.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light text-center p-5">
+                    <i class="fas fa-golf-ball fa-3x text-secondary"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ club.brand }} {{ club.name }}</h5>
+                    <p class="card-text text-muted">{{ club.club_type|capitalize }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary">{{ club.vote_count }} votes</span>
+                        <a href="{{ url_for('clubs.show', id=club.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No clubs available yet. Be the first to add a club!
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row mb-5">
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Popular Players</h2>
+            <a href="{{ url_for('players.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <hr>
+    </div>
+    
+    {% if top_players %}
+        {% for player in top_players %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                {% if player.profile_image %}
+                <img src="{{ player.profile_image }}" class="card-img-top" alt="{{ player.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light text-center p-5">
+                    <i class="fas fa-user-alt fa-3x text-secondary"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ player.name }}</h5>
+                    <p class="card-text text-muted">{{ player.country }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-primary">{{ player.vote_count }} votes</span>
+                            {% if player.verified %}
+                            <span class="badge bg-info ms-1"><i class="fas fa-check-circle"></i> Verified</span>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('players.show', id=player.id) }}" class="btn btn-sm btn-outline-primary">View Profile</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No players available yet. Be the first to add a player!
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Featured Courses</h2>
+            <a href="{{ url_for('courses.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <hr>
+    </div>
+    
+    {% if top_courses %}
+        {% for course in top_courses %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                {% if course.image_url %}
+                <img src="{{ course.image_url }}" class="card-img-top" alt="{{ course.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light text-center p-5">
+                    <i class="fas fa-flag fa-3x text-secondary"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ course.name }}</h5>
+                    <p class="card-text text-muted">{{ course.location }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary">{{ course.vote_count }} votes</span>
+                        <a href="{{ url_for('courses.show', id=course.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No courses available yet. Be the first to add a course!
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

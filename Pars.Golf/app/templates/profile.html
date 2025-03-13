@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                {% if user.profile_image %}
+                <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" alt="{{ user.username }}" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                    <i class="fas fa-user fa-4x text-secondary"></i>
+                </div>
+                {% endif %}
+                <h3>{{ user.username }}</h3>
+                <p class="text-muted">{{ user.formatted_username }}</p>
+                <p class="text-muted">{{ user.role.name }}</p>
+                {% if user.verified %}
+                <span class="badge bg-primary"><i class="fas fa-check-circle"></i> Verified Player</span>
+                {% endif %}
+                <p class="mt-3">{{ user.bio }}</p>
+                
+                {% if user == current_user %}
+                <div class="mt-3">
+                    <a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Voted Items</h5>
+                <ul class="nav nav-tabs card-header-tabs" id="votesTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="clubs-tab" data-bs-toggle="tab" data-bs-target="#clubs" type="button" role="tab" aria-controls="clubs" aria-selected="true">Clubs ({{ club_votes|length }})</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button" role="tab" aria-controls="players" aria-selected="false">Players ({{ player_votes|length }})</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button" role="tab" aria-controls="courses" aria-selected="false">Courses ({{ course_votes|length }})</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="votesTabContent">
+                    <div class="tab-pane fade show active" id="clubs" role="tabpanel" aria-labelledby="clubs-tab">
+                        {% if club_votes %}
+                        <div class="list-group">
+                            {% for vote in club_votes %}
+                            <a href="{{ url_for('clubs.show', id=vote.club_id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>{{ vote.club.brand }} {{ vote.club.name }}</span>
+                                    <span class="badge bg-primary rounded-pill">{{ vote.club.vote_count }} votes</span>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-center text-muted">No clubs voted for yet.</p>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane fade" id="players" role="tabpanel" aria-labelledby="players-tab">
+                        {% if player_votes %}
+                        <div class="list-group">
+                            {% for vote in player_votes %}
+                            <a href="{{ url_for('players.show', id=vote.player_id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>{{ vote.player.name }}</span>
+                                    <span class="badge bg-primary rounded-pill">{{ vote.player.vote_count }} votes</span>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-center text-muted">No players voted for yet.</p>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane fade" id="courses" role="tabpanel" aria-labelledby="courses-tab">
+                        {% if course_votes %}
+                        <div class="list-group">
+                            {% for vote in course_votes %}
+                            <a href="{{ url_for('courses.show', id=vote.course_id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>{{ vote.course.name }}</span>
+                                    <span class="badge bg-primary rounded-pill">{{ vote.course.vote_count }} votes</span>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-center text-muted">No courses voted for yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Submitted Items</h5>
+                <ul class="nav nav-tabs card-header-tabs" id="submissionsTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="submitted-clubs-tab" data-bs-toggle="tab" data-bs-target="#submitted-clubs" type="button" role="tab" aria-controls="submitted-clubs" aria-selected="true">Clubs ({{ clubs_submitted|length }})</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="submitted-players-tab" data-bs-toggle="tab" data-bs-target="#submitted-players" type="button" role="tab" aria-controls="submitted-players" aria-selected="false">Players ({{ players_submitted|length }})</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="submitted-courses-tab" data-bs-toggle="tab" data-bs-target="#submitted-courses" type="button" role="tab" aria-controls="submitted-courses" aria-selected="false">Courses ({{ courses_submitted|length }})</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="submissionsTabContent">
+                    <div class="tab-pane fade show active" id="submitted-clubs" role="tabpanel" aria-labelledby="submitted-clubs-tab">
+                        {% if clubs_submitted %}
+                        <div class="list-group">
+                            {% for club in clubs_submitted %}
+                            <a href="{{ url_for('clubs.show', id=club.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>{{ club.brand }} {{ club.name }}</span>
+                                    <div>
+                                        {% if not club.approved %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        {% endif %}
+                                        <span class="badge bg-primary rounded-pill">{{ club.vote_count }} votes</span>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-center text-muted">No clubs submitted yet.</p>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane fade" id="submitted-players" role="tabpanel" aria-labelledby="submitted-players-tab">
+                        {% if players_submitted %}
+                        <div class="list-group">
+                            {% for player in players_submitted %}
+                            <a href="{{ url_for('players.show', id=player.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>{{ player.name }}</span>
+                                    <div>
+                                        {% if not player.approved %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        {% endif %}
+                                        <span class="badge bg-primary rounded-pill">{{ player.vote_count }} votes</span>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-center text-muted">No players submitted yet.</p>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane fade" id="submitted-courses" role="tabpanel" aria-labelledby="submitted-courses-tab">
+                        {% if courses_submitted %}
+                        <div class="list-group">
+                            {% for course in courses_submitted %}
+                            <a href="{{ url_for('courses.show', id=course.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>{{ course.name }}</span>
+                                    <div>
+                                        {% if not course.approved %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        {% endif %}
+                                        <span class="badge bg-primary rounded-pill">{{ course.vote_count }} votes</span>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-center text-muted">No courses submitted yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
